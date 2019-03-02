@@ -12,6 +12,15 @@
     tools:context=".activities.LoginActivity">
 
     <!-- Login progress -->
+    <android.support.v7.widget.AppCompatButton
+        android:id="@+id/btn_register"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:layout_marginTop="24dp"
+        android:layout_marginBottom="24dp"
+        android:padding="12dp"
+        android:text="Register" />
+
     <ProgressBar
         android:id="@+id/login_progress"
         style="?android:attr/progressBarStyleLarge"
@@ -23,7 +32,7 @@
     <ScrollView
         android:id="@+id/login_form"
         android:layout_width="match_parent"
-        android:layout_height="match_parent">
+        android:layout_height="228dp">
 
         <LinearLayout
             android:id="@+id/email_login_form"
@@ -71,7 +80,7 @@
                 android:layout_marginTop="24dp"
                 android:layout_marginBottom="24dp"
                 android:padding="12dp"
-                android:text="Login"/>
+                android:text="Login" />
 
         </LinearLayout>
     </ScrollView>
