@@ -19,6 +19,8 @@ import java.util.ArrayList;
 import java.util.List;
 import java.util.concurrent.ExecutionException;
 
+import static com.example.parkAround.activities.LoginActivity.act;
+
 public class MainActivity extends AppCompatActivity {
     public Button buttonRequest;
     public ListView listView;
@@ -27,6 +29,9 @@ public class MainActivity extends AppCompatActivity {
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_main);
+
+        //finish the login activity
+        act.finish();
 
         this.buttonRequest = (Button) findViewById(R.id.buttonRequest);
         this.listView = (ListView) findViewById(R.id.listView1);

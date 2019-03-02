@@ -3,6 +3,7 @@ package com.example.parkAround.activities;
 import android.animation.Animator;
 import android.animation.AnimatorListenerAdapter;
 import android.annotation.TargetApi;
+import android.app.Activity;
 import android.content.Intent;
 import android.content.SharedPreferences;
 import android.content.pm.PackageManager;
@@ -67,7 +68,6 @@ public class LoginActivity extends AppCompatActivity implements LoaderCallbacks<
     /**
      * Keep track of the login task to ensure we can cancel it if requested.
      */
-    private UserLoginTask mAuthTask = null;
 
     // UI references.
     private AutoCompleteTextView mEmailView;
@@ -75,9 +75,12 @@ public class LoginActivity extends AppCompatActivity implements LoaderCallbacks<
     private View mProgressView;
     private View mLoginFormView;
 
+    public static Activity act;
+
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
+        act = this;
         setContentView(R.layout.activity_login);
         // Set up the login form.
         mEmailView = (AutoCompleteTextView) findViewById(R.id.email);
@@ -164,9 +167,6 @@ public class LoginActivity extends AppCompatActivity implements LoaderCallbacks<
      * errors are presented and no actual login attempt is made.
      */
     private void attemptLogin() {
-        if (mAuthTask != null) {
-            return;
-        }
 
         // Reset errors.
         mEmailView.setError(null);
@@ -204,11 +204,29 @@ public class LoginActivity extends AppCompatActivity implements LoaderCallbacks<
         } else {
             // Show a progress spinner, and kick off a background task to
             // perform the user login attempt.
-            showProgress(true);
-//            SendPostRequest sendPostRequest = new SendPostRequest(ruta);
-//            sendPostRequest
-            mAuthTask = new UserLoginTask(email, password);
-            mAuthTask.execute((Void) null);
+            //showProgress(true);
+            SendPostRequest request = null;
+            try {
+                request = new SendPostRequest(new URL("http://parkaround.herokuapp.com/api/checkUser"));
+                BCrypt bCrypt = new BCrypt();
+                String ecryptedPassword = bCrypt.hashpw(password, bCrypt.gensalt());
+
+                String response = request.execute("?email=" + email
+                        + "&password=" + ecryptedPassword).get();
+                System.out.println("?email=" + email
+                        + "&password=" + ecryptedPassword);
+                System.out.println("raspuns :" + response);
+                if(response.trim().equals("true")) {
+                    System.out.println("raspuns :" + response);
+                    Intent nextActivity;
+                    System.out.println("go to mainActivity");
+                    nextActivity = new Intent(getBaseContext(), MainActivity.class);
+                    startActivity(nextActivity);
+                    finish();
+                }// else if (response.equals("NOT OK") )
+            } catch (Exception e) {
+                e.printStackTrace();
+            }
         }
     }
 
@@ -312,74 +330,5 @@ public class LoginActivity extends AppCompatActivity implements LoaderCallbacks<
         int IS_PRIMARY = 1;
     }
 
-    /**
-     * Represents an asynchronous login/registration task used to authenticate
-     * the user.
-     */
-    public class UserLoginTask extends AsyncTask<Void, Void, Boolean> {
-
-        private final String mEmail;
-        private final String mPassword;
-        private final String ecryptedPassword;
-
-        UserLoginTask(String email, String password) {
-            mEmail = email;
-            mPassword = password;
-
-            BCrypt bCrypt = new BCrypt();
-            ecryptedPassword = bCrypt.hashpw(mPassword, bCrypt.gensalt());
-        }
-
-        @Override
-        protected Boolean doInBackground(Void... params) {
-            // TODO: attempt authentication against a network service.
-
-            try {
-                // Simulate network access.
-                Thread.sleep(2000);
-            } catch (InterruptedException e) {
-                return false;
-            }
-
-            for (String credential : DUMMY_CREDENTIALS) {
-                String[] pieces = credential.split(":");
-                if (pieces[0].equals(mEmail)) {
-                    // Account exists, return true if the password matches.
-                    return pieces[1].equals(mPassword);
-                }
-            }
-
-            // TODO: register the new account here.
-            return true;
-        }
-
-        @Override
-        protected void onPostExecute(final Boolean success) {
-            mAuthTask = null;
-            showProgress(false);
-
-            if (success) {
-
-                SharedPreferences sharedPreferences = getSharedPreferences("Login", MODE_PRIVATE);
-                SharedPreferences.Editor Ed=sharedPreferences.edit();
-                Ed.putString("mail",mEmail );
-                Ed.putString("password", ecryptedPassword);
-                Ed.commit();
-
-                Intent intentToMainActivity = new Intent(getBaseContext(), MainActivity.class);
-                startActivity(intentToMainActivity);
-                finish();
-            } else {
-                mPasswordView.setError(getString(R.string.error_incorrect_password));
-                mPasswordView.requestFocus();
-            }
-        }
-
-        @Override
-        protected void onCancelled() {
-            mAuthTask = null;
-            showProgress(false);
-        }
-    }
 }
 
