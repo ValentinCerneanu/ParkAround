@@ -23,21 +23,21 @@ public class StartActivity extends AppCompatActivity {
             public void onFinish(){
                 //set the new Content of your activity
                 SharedPreferences sharedPreferences = getSharedPreferences("Login", MODE_PRIVATE);
-                String username = sharedPreferences.getString("mail", null);
-                String password = sharedPreferences.getString("password", null);
+                String email = sharedPreferences.getString("email", null);
+                String password = sharedPreferences.getString("ecryptedPassword", null);
                 Intent nextActivity;
-                //if(username == null || password == null) {
+                if(email == null || password == null) {
                     System.out.println("go to login");
                     nextActivity = new Intent(getBaseContext(), LoginActivity.class);
                     startActivity(nextActivity);
                     finish();
-//                }
-//                else {
-//                    System.out.println("automaticalyy loggin");
-//                    Intent intentToMainActivity = new Intent(getBaseContext(), MainActivity.class);
-//                    startActivity(intentToMainActivity);
-//                    finish();
-//                }
+                }
+                else {
+                    System.out.println("automaticalyy loggin");
+                    Intent intentToMainActivity = new Intent(getBaseContext(), MainActivity.class);
+                    startActivity(intentToMainActivity);
+                    finish();
+                }
             }
         }.start();
     }

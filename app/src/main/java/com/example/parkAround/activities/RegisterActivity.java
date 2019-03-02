@@ -1,6 +1,7 @@
 package com.example.parkAround.activities;
 
 import android.content.Intent;
+import android.content.SharedPreferences;
 import android.os.Bundle;
 import android.support.design.widget.FloatingActionButton;
 import android.support.design.widget.Snackbar;
@@ -33,6 +34,7 @@ public class RegisterActivity extends AppCompatActivity {
         mName = (EditText) findViewById(R.id.input_name_register);
         mEmail = (EditText) findViewById(R.id.input_email_register);
         mPhone = (EditText) findViewById(R.id.input_phone_register);
+        mPhone.setTransformationMethod(null);
         mPassword = (EditText) findViewById(R.id.input_password1_register);
         mConfirmPassword = (EditText) findViewById(R.id.input_password2_register);
 
@@ -58,6 +60,14 @@ public class RegisterActivity extends AppCompatActivity {
                 + "&email=" + email + "&password=" + ecryptedPassword).get();
         System.out.println("raspuns :" + response);
         if(response.trim().equals("true")) {
+            SharedPreferences sharedPreferences = getSharedPreferences("Login", MODE_PRIVATE);
+            SharedPreferences.Editor Ed=sharedPreferences.edit();
+            Ed.putString("name", name);
+            Ed.putString("email", email);
+            Ed.putString("phone", phone);
+            Ed.putString("ecryptedPassword", ecryptedPassword);
+            Ed.commit();
+
             System.out.println("raspuns :" + response);
             Intent nextActivity;
             System.out.println("go to mainActivity");
@@ -68,10 +78,6 @@ public class RegisterActivity extends AppCompatActivity {
     }
 
     public void goBackToLogin(View v){
-        Intent nextActivity;
-        System.out.println("go to login");
-        nextActivity = new Intent(getBaseContext(), LoginActivity.class);
-        startActivity(nextActivity);
         finish();
     }
 

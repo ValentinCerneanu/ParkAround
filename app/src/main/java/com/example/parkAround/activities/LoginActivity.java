@@ -34,17 +34,11 @@ import android.widget.TextView;
 
 import com.example.examplehttpurlconnection.R;
 import com.example.parkAround.network.BCrypt;
-import com.example.parkAround.network.SendGetRequest;
 import com.example.parkAround.network.SendPostRequest;
 
-import org.json.JSONArray;
-import org.json.JSONException;
-
-import java.net.MalformedURLException;
 import java.net.URL;
 import java.util.ArrayList;
 import java.util.List;
-import java.util.concurrent.ExecutionException;
 
 import static android.Manifest.permission.READ_CONTACTS;
 
@@ -217,6 +211,12 @@ public class LoginActivity extends AppCompatActivity implements LoaderCallbacks<
                         + "&password=" + ecryptedPassword);
                 System.out.println("raspuns :" + response);
                 if(response.trim().equals("true")) {
+                    SharedPreferences sharedPreferences = getSharedPreferences("Login", MODE_PRIVATE);
+                    SharedPreferences.Editor Ed=sharedPreferences.edit();
+                    Ed.putString("email", email);
+                    Ed.putString("ecryptedPassword", ecryptedPassword);
+                    Ed.commit();
+
                     System.out.println("raspuns :" + response);
                     Intent nextActivity;
                     System.out.println("go to mainActivity");
