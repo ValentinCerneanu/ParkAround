@@ -1,16 +1,22 @@
 package com.example.parkAround.activities;
 
 import android.Manifest;
+import android.app.Activity;
+import android.content.Context;
 import android.content.DialogInterface;
 import android.content.pm.PackageManager;
 import android.os.Bundle;
+import android.support.design.widget.NavigationView;
 import android.support.v4.app.ActivityCompat;
 import android.support.v4.app.Fragment;
 import android.support.v4.content.ContextCompat;
 import android.support.v7.app.AlertDialog;
+import android.view.DragEvent;
 import android.view.LayoutInflater;
+import android.view.MenuItem;
 import android.view.View;
 import android.view.ViewGroup;
+import android.view.inputmethod.InputMethodManager;
 import android.widget.RelativeLayout;
 
 import com.example.examplehttpurlconnection.R;
@@ -23,18 +29,36 @@ import com.google.android.gms.maps.model.CameraPosition;
 import com.google.android.gms.maps.model.LatLng;
 import com.google.android.gms.maps.model.MarkerOptions;
 
-import java.util.ArrayList;
-
 public class MapViewFragment extends Fragment {
 
     MapView mMapView;
+    NavigationView navigationView;
     private GoogleMap googleMap;
-
-    ArrayList<LatLng> markerPoints;
 
     @Override
     public View onCreateView(LayoutInflater inflater, ViewGroup container, Bundle savedInstanceState) {
         View rootView = inflater.inflate(R.layout.location_fragment, container, false);
+        final View v = rootView;
+        navigationView = (NavigationView) rootView.findViewById(R.id.nav_view);
+        navigationView.setOnDragListener(new NavigationView.OnDragListener(){
+
+            @Override
+            public boolean onDrag(View v, DragEvent event) {
+                System.out.println("nuu");
+                Context context = getActivity().getApplicationContext();
+                hideKeyboardFrom(context, v);
+                return false;
+            }
+        });
+
+        navigationView.setNavigationItemSelectedListener(new NavigationView.OnNavigationItemSelectedListener() {
+            // This method will trigger on item Click of navigation menu
+            @Override
+            public boolean onNavigationItemSelected(MenuItem menuItem) {
+                System.out.println("da00");
+                return true;
+            }
+        });
 
         mMapView= (MapView) rootView.findViewById(R.id.mapView);
         mMapView.onCreate(savedInstanceState);
@@ -116,6 +140,11 @@ public class MapViewFragment extends Fragment {
     public void onLowMemory() {
         super.onLowMemory();
         mMapView.onLowMemory();
+    }
+
+    public void hideKeyboardFrom(Context context, View view) {
+        InputMethodManager imm = (InputMethodManager) context.getSystemService(Activity.INPUT_METHOD_SERVICE);
+        imm.hideSoftInputFromWindow(view.getWindowToken(), 0);
     }
 
     public boolean checkLocationPermission() {
