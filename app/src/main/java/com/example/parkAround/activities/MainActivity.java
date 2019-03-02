@@ -36,13 +36,14 @@ public class MainActivity extends AppCompatActivity {
     public void callRequest(View v) throws JSONException, ExecutionException, InterruptedException {
         SendGetRequest request = null;
         try {
-            request = new SendGetRequest(new URL("https://jsonplaceholder.typicode.com/posts"));
+            request = new SendGetRequest(new URL("http://parkaround.herokuapp.com/api/post"));
         } catch (MalformedURLException e) {
             e.printStackTrace();
         }
 
-        String response = request.execute("?userId=1").get();
-        JSONArray jsonArray = new JSONArray(response);
+        String response = request.execute("?name=name&email=coste51&password=123123").get();
+        System.out.println("raspuns :" + response);
+/*        JSONArray jsonArray = new JSONArray(response);
         System.out.println(response);
         List<String> your_array_list = new ArrayList<String>();
 
@@ -54,7 +55,7 @@ public class MainActivity extends AppCompatActivity {
                 this,
                 android.R.layout.simple_list_item_1,
                 your_array_list);
-        listView.setAdapter(arrayAdapter);
+        listView.setAdapter(arrayAdapter);*/
     }
 
 

@@ -26,18 +26,18 @@ public class StartActivity extends AppCompatActivity {
                 String username = sharedPreferences.getString("mail", null);
                 String password = sharedPreferences.getString("password", null);
                 Intent nextActivity;
-                if(username == null || password == null) {
+                //if(username == null || password == null) {
                     System.out.println("go to login");
                     nextActivity = new Intent(getBaseContext(), LoginActivity.class);
                     startActivity(nextActivity);
                     finish();
-                }
-                else {
-                    System.out.println("automaticalyy loggin");
-                    Intent intentToMainActivity = new Intent(getBaseContext(), MainActivity.class);
-                    startActivity(intentToMainActivity);
-                    finish();
-                }
+//                }
+//                else {
+//                    System.out.println("automaticalyy loggin");
+//                    Intent intentToMainActivity = new Intent(getBaseContext(), MainActivity.class);
+//                    startActivity(intentToMainActivity);
+//                    finish();
+//                }
             }
         }.start();
     }
