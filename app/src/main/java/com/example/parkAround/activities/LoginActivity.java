@@ -33,10 +33,17 @@ import android.widget.TextView;
 
 import com.example.examplehttpurlconnection.R;
 import com.example.parkAround.network.BCrypt;
+import com.example.parkAround.network.SendGetRequest;
 import com.example.parkAround.network.SendPostRequest;
 
+import org.json.JSONArray;
+import org.json.JSONException;
+
+import java.net.MalformedURLException;
+import java.net.URL;
 import java.util.ArrayList;
 import java.util.List;
+import java.util.concurrent.ExecutionException;
 
 import static android.Manifest.permission.READ_CONTACTS;
 
@@ -98,6 +105,13 @@ public class LoginActivity extends AppCompatActivity implements LoaderCallbacks<
 
         mLoginFormView = findViewById(R.id.login_form);
         mProgressView = findViewById(R.id.login_progress);
+    }
+
+    public void goToRegister(View v) {
+        Intent nextActivity;
+        System.out.println("go to register");
+        nextActivity = new Intent(getBaseContext(), RegisterActivity.class);
+        startActivity(nextActivity);
     }
 
     private void populateAutoComplete() {
