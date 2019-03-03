@@ -4,6 +4,7 @@ import android.Manifest;
 import android.app.Activity;
 import android.content.Context;
 import android.content.DialogInterface;
+import android.content.SharedPreferences;
 import android.content.pm.PackageManager;
 import android.os.Bundle;
 import android.support.design.widget.NavigationView;
@@ -17,7 +18,9 @@ import android.view.MenuItem;
 import android.view.View;
 import android.view.ViewGroup;
 import android.view.inputmethod.InputMethodManager;
+import android.widget.EditText;
 import android.widget.RelativeLayout;
+import android.widget.TextView;
 
 import com.example.examplehttpurlconnection.R;
 import com.google.android.gms.maps.CameraUpdateFactory;
@@ -29,6 +32,8 @@ import com.google.android.gms.maps.model.CameraPosition;
 import com.google.android.gms.maps.model.LatLng;
 import com.google.android.gms.maps.model.MarkerOptions;
 
+import static android.content.Context.MODE_PRIVATE;
+
 public class MapViewFragment extends Fragment {
 
     MapView mMapView;
@@ -39,6 +44,7 @@ public class MapViewFragment extends Fragment {
     public View onCreateView(LayoutInflater inflater, ViewGroup container, Bundle savedInstanceState) {
         View rootView = inflater.inflate(R.layout.location_fragment, container, false);
         final View v = rootView;
+
         navigationView = (NavigationView) rootView.findViewById(R.id.nav_view);
         navigationView.setOnDragListener(new NavigationView.OnDragListener(){
 
@@ -51,6 +57,13 @@ public class MapViewFragment extends Fragment {
             }
         });
 
+        View headerLayout = navigationView.getHeaderView(0);
+        TextView userEditText = (TextView) headerLayout.findViewById(R.id.user);
+        SharedPreferences sharedPreferences = getActivity().getSharedPreferences("Login", MODE_PRIVATE);
+        String user = sharedPreferences.getString("name", null);
+        if(user != null) {
+            userEditText.setText(user);
+        }
         navigationView.setNavigationItemSelectedListener(new NavigationView.OnNavigationItemSelectedListener() {
             // This method will trigger on item Click of navigation menu
             @Override

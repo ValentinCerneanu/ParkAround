@@ -16,7 +16,6 @@ import android.content.CursorLoader;
 import android.content.Loader;
 import android.database.Cursor;
 import android.net.Uri;
-import android.os.AsyncTask;
 
 import android.os.Build;
 import android.os.Bundle;
@@ -35,6 +34,8 @@ import android.widget.TextView;
 import com.example.examplehttpurlconnection.R;
 import com.example.parkAround.network.BCrypt;
 import com.example.parkAround.network.SendPostRequest;
+
+import org.json.JSONObject;
 
 import java.net.URL;
 import java.util.ArrayList;
@@ -205,14 +206,15 @@ public class LoginActivity extends AppCompatActivity implements LoaderCallbacks<
                 BCrypt bCrypt = new BCrypt();
                 String ecryptedPassword = bCrypt.hashpw(password, bCrypt.gensalt());
 
-                String response = request.execute("?email=" + email
+                JSONObject response = request.execute("?email=" + email
                         + "&password=" + ecryptedPassword).get();
                 System.out.println("?email=" + email
                         + "&password=" + ecryptedPassword);
                 System.out.println("raspuns :" + response);
-                if(response.trim().equals("true")) {
+                if (response.has("id")) {
                     SharedPreferences sharedPreferences = getSharedPreferences("Login", MODE_PRIVATE);
                     SharedPreferences.Editor Ed=sharedPreferences.edit();
+                    Ed.putString("id", response.get("id").toString());
                     Ed.putString("email", email);
                     Ed.putString("ecryptedPassword", ecryptedPassword);
                     Ed.commit();
@@ -223,7 +225,9 @@ public class LoginActivity extends AppCompatActivity implements LoaderCallbacks<
                     nextActivity = new Intent(getBaseContext(), MainActivity.class);
                     startActivity(nextActivity);
                     finish();
-                }// else if (response.equals("NOT OK") )
+                } else {
+                    mPasswordView.setError(getString(R.string.error_incorrect_password));
+                }
             } catch (Exception e) {
                 e.printStackTrace();
             }

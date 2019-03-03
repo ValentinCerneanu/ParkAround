@@ -3,6 +3,8 @@ package com.example.parkAround.network;
 import android.os.AsyncTask;
 
 import org.json.JSONArray;
+import org.json.JSONException;
+import org.json.JSONObject;
 
 import java.io.BufferedReader;
 import java.io.IOException;
@@ -13,9 +15,8 @@ import java.net.URL;
 
 import javax.net.ssl.HttpsURLConnection;
 
-public class SendPostRequest extends AsyncTask<String, Void, String> {
+public class SendPostRequest extends AsyncTask<String, Void, JSONObject> {
     private URL url;
-    private JSONArray response;
 
     public SendPostRequest(URL url) {
         this.url = url;
@@ -24,52 +25,49 @@ public class SendPostRequest extends AsyncTask<String, Void, String> {
     protected void onPreExecute() {
     }
 
-    protected String doInBackground(String... arg0) {
+    protected JSONObject doInBackground(String... arg0)  {
 
         try {
 
-            System.out.println("ARG0:" + arg0.toString());
             url = new URL(url.toString() + arg0[0]);
             HttpURLConnection conn = (HttpURLConnection) url.openConnection();
             conn.setReadTimeout(15000 /* milliseconds */);
             conn.setConnectTimeout(15000 /* milliseconds */);
             conn.setRequestMethod("POST");
-            String responseBody = convertStreamToString(conn.getInputStream());
-            System.out.println("responseBody :" + responseBody);
+
+            BufferedReader br = new BufferedReader(new InputStreamReader(conn.getInputStream()));
+            StringBuilder sb = new StringBuilder();
+            String line;
+            while ((line = br.readLine()) != null) {
+                sb.append(line+"\n");
+            }
+            br.close();
+
+            JSONObject responseBody = new JSONObject(sb.toString());
 
             int responseCode = conn.getResponseCode();
 
             if (responseCode == HttpsURLConnection.HTTP_OK) {
                 return responseBody;
             } else {
-                return new String("false : " + responseCode);
+                String s = "{\"responseCode\":" + "\"" + responseCode +"\"}";
+                return new JSONObject(s);
             }
         } catch (Exception e) {
-            return new String("Exception: " + e.getMessage());
+            String s = "{\"Exception\":" + "\"" + e.getMessage() +"\"}";
+            try {
+                return new JSONObject(s);
+            } catch (JSONException e1) {
+                e1.printStackTrace();
+            }
         }
+        return null;
     }
 
     @Override
-    protected void onPostExecute(String result) {
+    protected void onPostExecute(JSONObject result) {
         //Toast.makeText(getApplicationContext(), result,
         //Toast.LENGTH_LONG).show();
     }
 
-    private String convertStreamToString(InputStream is) {
-        BufferedReader reader = new BufferedReader(new InputStreamReader(is));
-        StringBuilder sb = new StringBuilder();
-        String line = null;
-        try {
-            while ((line = reader.readLine()) != null) {
-                sb.append(line).append("\n");
-            }
-        } catch (IOException e) {
-        } finally {
-            try {
-                is.close();
-            } catch (IOException e) {
-            }
-        }
-        return sb.toString();
-    }
 }
