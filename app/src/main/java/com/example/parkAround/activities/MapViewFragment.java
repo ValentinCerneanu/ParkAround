@@ -4,12 +4,11 @@ import android.Manifest;
 import android.app.Activity;
 import android.content.Context;
 import android.content.DialogInterface;
+import android.content.Intent;
 import android.content.SharedPreferences;
 import android.content.pm.PackageManager;
-import android.location.Criteria;
-import android.location.Location;
-import android.location.LocationManager;
 import android.os.Bundle;
+import android.support.design.widget.FloatingActionButton;
 import android.support.design.widget.NavigationView;
 import android.support.v4.app.ActivityCompat;
 import android.support.v4.app.Fragment;
@@ -46,7 +45,6 @@ import java.net.URL;
 import java.util.Iterator;
 
 import static android.content.Context.MODE_PRIVATE;
-import static android.support.v4.content.ContextCompat.getSystemService;
 
 public class MapViewFragment extends Fragment {
 
@@ -61,6 +59,17 @@ public class MapViewFragment extends Fragment {
     public View onCreateView(LayoutInflater inflater, ViewGroup container, Bundle savedInstanceState) {
         View rootView = inflater.inflate(R.layout.location_fragment, container, false);
         final View v = rootView;
+
+        FloatingActionButton fab = rootView.findViewById(R.id.fab);
+        fab.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View view) {
+                Intent nextActivity;
+                System.out.println("go to mainActivity");
+                nextActivity = new Intent(getContext(), AddParkingSpaceActivity.class);
+                startActivity(nextActivity);
+            }
+        });
 
         mAddress = (EditText) rootView.findViewById(R.id.search);
         drawerLayout = rootView.findViewById(R.id.drawerlayout);
@@ -126,7 +135,34 @@ public class MapViewFragment extends Fragment {
             // This method will trigger on item Click of navigation menu
             @Override
             public boolean onNavigationItemSelected(MenuItem menuItem) {
-                return true;
+                System.out.println("da");
+                if (menuItem.isChecked()) menuItem.setChecked(false);
+                else menuItem.setChecked(true);
+
+                //Closing drawer on item click
+                drawerLayout.closeDrawers();
+
+                //Check to see which item was being clicked and perform appropriate action
+                switch (menuItem.getItemId()) {
+
+                    //Replacing the main content with ContentFragment
+
+                    case R.id.nav_logout:
+                    {
+                        System.out.println("da");
+                        SharedPreferences sharedPreferences = getActivity().getSharedPreferences("Login", MODE_PRIVATE);
+                        SharedPreferences.Editor Ed = sharedPreferences.edit();
+                        Ed.putString("name", null);
+                        Ed.putString("id", null);
+                        Ed.putString("email", null);
+                        Ed.putString("phone", null);
+                        Ed.putString("ecryptedPassword", null);
+                        Ed.commit();
+                        getActivity().finishAffinity();
+                    }
+                        return true;
+                }
+                return false;
             }
         });
 
