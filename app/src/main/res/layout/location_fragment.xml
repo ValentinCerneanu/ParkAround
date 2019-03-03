@@ -17,6 +17,7 @@
             android:background="#ffffff">
 
             <ImageButton
+                android:id="@+id/hamburger_btn"
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
                 android:src="@drawable/places_ic_search" />
@@ -33,7 +34,7 @@
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
                 android:src="@drawable/places_ic_search"
-                android:onClick="searchRequest"/>
+                />
         </android.support.v7.widget.Toolbar>
 
         <com.google.android.gms.maps.MapView
