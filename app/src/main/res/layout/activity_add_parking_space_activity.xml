@@ -7,9 +7,9 @@
     <TextView
         android:id="@+id/text_id"
         android:layout_width="300dp"
-        android:layout_height="200dp"
-        android:layout_marginTop="50dp"
-        android:layout_marginLeft="50dp"
+        android:layout_height="100dp"
+        android:layout_marginTop="30dp"
+        android:layout_marginLeft="30dp"
         android:layout_marginRight="50dp"
         android:gravity="center"
         android:text="Place your phone where the parking spot will be"
@@ -22,36 +22,64 @@
     <android.support.design.widget.TextInputLayout
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
-        android:layout_marginTop="50dp"
-        android:layout_marginLeft="10dp"
-        android:layout_marginBottom="5dp">
+        android:layout_marginTop="10dp"
+        android:layout_marginLeft="10dp">
         <EditText android:id="@+id/address"
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
             android:inputType="textCapWords"
-            android:hint="adress" />
+            android:hint="Adress" />
     </android.support.design.widget.TextInputLayout>
 
     <android.support.design.widget.TextInputLayout
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
         android:layout_marginTop="10dp"
-        android:layout_marginLeft="10dp"
-        android:layout_marginBottom="5dp">
+        android:layout_marginLeft="10dp">
+        <EditText android:id="@+id/details"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:inputType="textCapWords"
+            android:hint="Details" />
+    </android.support.design.widget.TextInputLayout>
+
+    <Button
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:text="Start time"
+        android:onClick="showTimePickerStartTime" />
+    <Button
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:text="End time"
+        android:onClick="showTimePickerEndTime" />
+
+    <ca.antonious.materialdaypicker.MaterialDayPicker
+        android:id="@+id/day_picker"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:layout_marginTop="10dp"
+        android:layout_marginLeft="5dp"
+        android:layout_marginRight="5dp"
+        />
+
+    <android.support.design.widget.TextInputLayout
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:layout_marginTop="10dp"
+        android:layout_marginLeft="10dp">
         <EditText android:id="@+id/price"
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
             android:inputType="numberDecimal"
-            android:hint="Price per hour" />
+            android:hint="Price per hour (lei)" />
     </android.support.design.widget.TextInputLayout>
 
     <android.support.v7.widget.AppCompatButton
         android:id="@+id/btn_register_parking"
         android:layout_width="fill_parent"
         android:layout_height="82dp"
-        android:layout_marginTop="50dp"
-        android:layout_marginBottom="8dp"
-        android:padding="12dp"
+        android:layout_marginTop="10dp"
         android:text="Register your parking spot" />
 
 </LinearLayout>

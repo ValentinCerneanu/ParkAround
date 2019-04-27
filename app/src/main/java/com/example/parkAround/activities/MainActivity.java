@@ -2,11 +2,8 @@ package com.example.parkAround.activities;
 
 import android.os.Bundle;
 import android.support.v7.app.AppCompatActivity;
-import android.widget.Button;
-import android.widget.ListView;
 
 import com.example.examplehttpurlconnection.R;
-
 
 import static com.example.parkAround.activities.LoginActivity.act;
 

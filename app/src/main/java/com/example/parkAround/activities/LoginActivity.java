@@ -204,20 +204,20 @@ public class LoginActivity extends AppCompatActivity implements LoaderCallbacks<
             try {
                 request = new SendPostRequest(new URL("http://parkaround.herokuapp.com/api/checkUser"));
                 BCrypt bCrypt = new BCrypt();
-                String ecryptedPassword = bCrypt.hashpw(password, bCrypt.gensalt());
 
                 JSONObject response = request.execute("?email=" + email
-                        + "&password=" + ecryptedPassword).get();
+                        + "&password=" + password).get();
                 System.out.println("?email=" + email
-                        + "&password=" + ecryptedPassword);
+                        + "&password=" + password);
                 System.out.println("raspuns :" + response);
                 if (response.has("id")) {
                     SharedPreferences sharedPreferences = getSharedPreferences("Login", MODE_PRIVATE);
-                    SharedPreferences.Editor Ed=sharedPreferences.edit();
-                    Ed.putString("id", response.get("id").toString());
-                    Ed.putString("email", email);
-                    Ed.putString("ecryptedPassword", ecryptedPassword);
-                    Ed.commit();
+                    SharedPreferences.Editor ed = sharedPreferences.edit();
+                    ed.putString("id", response.get("id").toString());
+                    ed.putString("name", response.get("name").toString());
+                    ed.putString("email", email);
+                    ed.putString("password", password);
+                    ed.commit();
 
                     System.out.println("raspuns :" + response);
                     Intent nextActivity;
@@ -227,6 +227,7 @@ public class LoginActivity extends AppCompatActivity implements LoaderCallbacks<
                     finish();
                 } else {
                     mPasswordView.setError(getString(R.string.error_incorrect_password));
+
                 }
             } catch (Exception e) {
                 e.printStackTrace();

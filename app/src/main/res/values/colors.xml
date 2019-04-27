@@ -3,4 +3,7 @@
     <color name="colorPrimary">#D3D3D3</color>
     <color name="colorPrimaryDark">#D3D3D3</color>
     <color name="colorAccent">#D3D3D3</color>
+    <color name="dayPressed">@android:color/holo_blue_dark</color>
+    <color name="daySelected">@android:color/holo_blue_dark</color>
+    <color name="dayDeselected">#D3D3D3</color>
 </resources>

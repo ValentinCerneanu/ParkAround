@@ -49,10 +49,8 @@ public class RegisterActivity extends AppCompatActivity {
         String name = mName.getText().toString();
         String email = mEmail.getText().toString();
         String phone = mPhone.getText().toString();
-        BCrypt bCrypt = new BCrypt();
         String password = mPassword.getText().toString();
         String passwordConfirmed = mConfirmPassword.getText().toString();
-        String ecryptedPassword = bCrypt.hashpw(password, bCrypt.gensalt());
 
         View focusView = null;
         boolean cancel = false;
@@ -102,18 +100,18 @@ public class RegisterActivity extends AppCompatActivity {
             }
             JSONObject response = request.execute("?name=" + name
                     + "&phone=" + phone
-                    + "&email=" + email + "&password=" + ecryptedPassword).get();
+                    + "&email=" + email + "&password=" + password).get();
             System.out.println("raspuns :" + response);
 
             if (response.has("id")) {
                 SharedPreferences sharedPreferences = getSharedPreferences("Login", MODE_PRIVATE);
-                SharedPreferences.Editor Ed = sharedPreferences.edit();
-                Ed.putString("name", name);
-                Ed.putString("id", response.get("id").toString());
-                Ed.putString("email", email);
-                Ed.putString("phone", phone);
-                Ed.putString("ecryptedPassword", ecryptedPassword);
-                Ed.commit();
+                SharedPreferences.Editor ed = sharedPreferences.edit();
+                ed.putString("name", name);
+                ed.putString("id", response.get("id").toString());
+                ed.putString("email", email);
+                ed.putString("phone", phone);
+                ed.putString("password", password);
+                ed.commit();
 
                 System.out.println("raspuns :" + response);
                 Intent nextActivity;

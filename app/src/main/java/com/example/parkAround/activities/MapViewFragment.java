@@ -15,7 +15,6 @@ import android.support.v4.app.Fragment;
 import android.support.v4.content.ContextCompat;
 import android.support.v4.widget.DrawerLayout;
 import android.support.v7.app.AlertDialog;
-import android.view.DragEvent;
 import android.view.Gravity;
 import android.view.LayoutInflater;
 import android.view.MenuItem;
@@ -78,6 +77,8 @@ public class MapViewFragment extends Fragment {
         burgerBtn.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
+                Context context = getActivity().getApplicationContext();
+                hideKeyboardFrom(context, v);
                 drawerLayout .openDrawer(Gravity.LEFT);
             }
         });
@@ -92,18 +93,20 @@ public class MapViewFragment extends Fragment {
                     request = new SendPostRequest(new URL("http://parkaround.herokuapp.com/api/getParkingSpacesByAddress"));
 
                     String address = mAddress.getText().toString();
-                    JSONObject response = request.execute("?address=" + address).get();
-                    System.out.println("raspuns :" + response);
-                    Iterator<String> keys = response.keys();
-                    while (keys.hasNext()) {
-                        String key = keys.next();
-                        JSONObject row = new JSONObject(response.get(key).toString());
-                        addMarker(row);
-                        LatLng point = new LatLng(Float.parseFloat(row.get("latitude").toString()), Float.parseFloat(row.get("longitude").toString()));
-                        zoom(point);
-                        System.out.println("key: " + row.get("address"));
-                    }
+                    if(!address.equals("")) {
+                        JSONObject response = request.execute("?address=" + address).get();
+                        System.out.println("raspuns :" + response);
 
+                        Iterator<String> keys = response.keys();
+                        while (keys.hasNext()) {
+                            String key = keys.next();
+                            JSONObject row = new JSONObject(response.get(key).toString());
+                            addMarker(row);
+                            LatLng point = new LatLng(Float.parseFloat(row.get("latitude").toString()), Float.parseFloat(row.get("longitude").toString()));
+                            zoom(point);
+                            System.out.println("key: " + row.get("address"));
+                        }
+                    }
                 } catch (Exception e) {
                     e.printStackTrace();
 
@@ -112,36 +115,29 @@ public class MapViewFragment extends Fragment {
         });
 
         navigationView = (NavigationView) rootView.findViewById(R.id.nav_view);
-
-        navigationView.setOnDragListener(new NavigationView.OnDragListener() {
-
-            @Override
-            public boolean onDrag(View v, DragEvent event) {
-                System.out.println("nuu");
-                Context context = getActivity().getApplicationContext();
-                hideKeyboardFrom(context, v);
-                return false;
-            }
-        });
+        navigationView.bringToFront();
 
         View headerLayout = navigationView.getHeaderView(0);
         TextView userEditText = (TextView) headerLayout.findViewById(R.id.user);
         SharedPreferences sharedPreferences = getActivity().getSharedPreferences("Login", MODE_PRIVATE);
-        String user = sharedPreferences.getString("name", null);
-        if (user != null) {
-            userEditText.setText(user);
+        String userName = sharedPreferences.getString("name", null);
+        if (userName != null) {
+            userEditText.setText("Hello, " + userName +"!");
         }
         navigationView.setNavigationItemSelectedListener(new NavigationView.OnNavigationItemSelectedListener() {
+
             // This method will trigger on item Click of navigation menu
             @Override
             public boolean onNavigationItemSelected(MenuItem menuItem) {
+                Context context = getActivity().getApplicationContext();
+                hideKeyboardFrom(context, v);
                 System.out.println("da");
                 if (menuItem.isChecked()) menuItem.setChecked(false);
                 else menuItem.setChecked(true);
 
                 //Closing drawer on item click
                 drawerLayout.closeDrawers();
-
+                System.out.println("1");
                 //Check to see which item was being clicked and perform appropriate action
                 switch (menuItem.getItemId()) {
 
@@ -287,6 +283,7 @@ public class MapViewFragment extends Fragment {
     }
 
     public void hideKeyboardFrom(Context context, View view) {
+        System.out.println("inchid tastatura");
         InputMethodManager imm = (InputMethodManager) context.getSystemService(Activity.INPUT_METHOD_SERVICE);
         imm.hideSoftInputFromWindow(view.getWindowToken(), 0);
     }
