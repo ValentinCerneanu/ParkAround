@@ -6,13 +6,11 @@
 
     <TextView
         android:id="@+id/text_id"
-        android:layout_width="300dp"
-        android:layout_height="100dp"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
         android:layout_marginTop="30dp"
-        android:layout_marginLeft="30dp"
-        android:layout_marginRight="50dp"
         android:gravity="center"
-        android:text="Place your phone where the parking spot will be"
+        android:text="Place your phone where the\n parking spot will be"
         android:textColor="@android:color/holo_blue_dark"
         android:textColorHighlight="@android:color/primary_text_dark"
         android:layout_centerVertical="true"
@@ -43,16 +41,78 @@
             android:hint="Details" />
     </android.support.design.widget.TextInputLayout>
 
-    <Button
+    <TextView
+        android:id="@+id/startEndTime"
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
-        android:text="Start time"
-        android:onClick="showTimePickerStartTime" />
-    <Button
+        android:layout_marginTop="10dp"
+        android:gravity="center"
+        android:text="Choose start time and end time"
+        android:textColor="@android:color/holo_blue_dark"
+        android:textColorHighlight="@android:color/primary_text_dark"
+        android:layout_centerVertical="true"
+        android:layout_alignParentEnd="true"
+        android:textSize="20sp"/>
+
+    <LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
+        android:layout_width="fill_parent"
+        android:layout_height="wrap_content"
+        android:layout_marginTop="10dp"
+        android:layout_marginLeft="10dp"
+        android:orientation="horizontal" >
+        <TextView
+            android:id="@+id/startTimeTextView"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:gravity="center"
+            android:text="00:00"
+            android:textColor="@android:color/holo_blue_dark"
+            android:textColorHighlight="@android:color/primary_text_dark"
+            android:layout_centerVertical="true"
+            android:layout_alignParentEnd="true"
+            android:textSize="20sp"/>
+        <Button
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:text="Start time"
+            android:onClick="showTimePickerStartTime" />
+    </LinearLayout>
+    <LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
+        android:layout_width="fill_parent"
+        android:layout_height="wrap_content"
+        android:layout_marginTop="10dp"
+        android:layout_marginLeft="10dp"
+        android:orientation="horizontal" >
+        <TextView
+            android:id="@+id/endTimeTextView"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:gravity="center"
+            android:text="00:00"
+            android:textColor="@android:color/holo_blue_dark"
+            android:textColorHighlight="@android:color/primary_text_dark"
+            android:layout_centerVertical="true"
+            android:layout_alignParentEnd="true"
+            android:textSize="20sp"/>
+        <Button
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:text="End time"
+            android:onClick="showTimePickerEndTime" />
+    </LinearLayout>
+
+    <TextView
+        android:id="@+id/weekdays"
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
-        android:text="End time"
-        android:onClick="showTimePickerEndTime" />
+        android:layout_marginTop="10dp"
+        android:gravity="center"
+        android:text="Choose at leat one week day"
+        android:textColor="@android:color/holo_blue_dark"
+        android:textColorHighlight="@android:color/primary_text_dark"
+        android:layout_centerVertical="true"
+        android:layout_alignParentEnd="true"
+        android:textSize="20sp"/>
 
     <ca.antonious.materialdaypicker.MaterialDayPicker
         android:id="@+id/day_picker"

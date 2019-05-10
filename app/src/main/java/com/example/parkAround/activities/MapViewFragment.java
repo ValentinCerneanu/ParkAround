@@ -7,6 +7,8 @@ import android.content.DialogInterface;
 import android.content.Intent;
 import android.content.SharedPreferences;
 import android.content.pm.PackageManager;
+import android.graphics.Color;
+import android.graphics.Typeface;
 import android.os.Bundle;
 import android.support.design.widget.FloatingActionButton;
 import android.support.design.widget.NavigationView;
@@ -16,13 +18,16 @@ import android.support.v4.content.ContextCompat;
 import android.support.v4.widget.DrawerLayout;
 import android.support.v7.app.AlertDialog;
 import android.view.Gravity;
+import android.view.KeyEvent;
 import android.view.LayoutInflater;
 import android.view.MenuItem;
 import android.view.View;
 import android.view.ViewGroup;
+import android.view.inputmethod.EditorInfo;
 import android.view.inputmethod.InputMethodManager;
 import android.widget.EditText;
 import android.widget.ImageButton;
+import android.widget.LinearLayout;
 import android.widget.RelativeLayout;
 import android.widget.TextView;
 
@@ -35,6 +40,7 @@ import com.google.android.gms.maps.MapsInitializer;
 import com.google.android.gms.maps.OnMapReadyCallback;
 import com.google.android.gms.maps.model.CameraPosition;
 import com.google.android.gms.maps.model.LatLng;
+import com.google.android.gms.maps.model.Marker;
 import com.google.android.gms.maps.model.MarkerOptions;
 
 import org.json.JSONException;
@@ -51,16 +57,25 @@ public class MapViewFragment extends Fragment {
     NavigationView navigationView;
     private GoogleMap googleMap;
     EditText mAddress;
-    ImageButton imgBtn;
+    ImageButton searchBarBtn;
     ImageButton burgerBtn;
     DrawerLayout drawerLayout;
+    FloatingActionButton addNewParkingBtn;
+    FloatingActionButton getParkingSpacesByDirectLocation;
     @Override
     public View onCreateView(LayoutInflater inflater, ViewGroup container, Bundle savedInstanceState) {
         View rootView = inflater.inflate(R.layout.location_fragment, container, false);
         final View v = rootView;
+        getParkingSpacesByDirectLocation = rootView.findViewById(R.id.getParkingSpacesBtn);
+        getParkingSpacesByDirectLocation.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View view) {
+                searchParkingSpotByDirectLocation();
+            }
+        });
 
-        FloatingActionButton fab = rootView.findViewById(R.id.fab);
-        fab.setOnClickListener(new View.OnClickListener() {
+        addNewParkingBtn = rootView.findViewById(R.id.addParkingSpaceBtn);
+        addNewParkingBtn.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View view) {
                 Intent nextActivity;
@@ -71,6 +86,14 @@ public class MapViewFragment extends Fragment {
         });
 
         mAddress = (EditText) rootView.findViewById(R.id.search);
+        mAddress.setOnEditorActionListener(new TextView.OnEditorActionListener() {
+            public boolean onEditorAction(TextView v, int actionId, KeyEvent event) {
+                if ((event != null && (event.getKeyCode() == KeyEvent.KEYCODE_ENTER)) || (actionId == EditorInfo.IME_ACTION_DONE)) {
+                    searchParkingSpotByAddress(mAddress.getText().toString());
+                }
+                return false;
+            }
+        });
         drawerLayout = rootView.findViewById(R.id.drawerlayout);
 
         burgerBtn = (ImageButton) rootView.findViewById(R.id.hamburger_btn);
@@ -83,34 +106,11 @@ public class MapViewFragment extends Fragment {
             }
         });
 
-        imgBtn = (ImageButton) rootView.findViewById(R.id.search_button);
-        imgBtn.setOnClickListener(new View.OnClickListener() {
+        searchBarBtn = (ImageButton) rootView.findViewById(R.id.search_button);
+        searchBarBtn.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
-                SendPostRequest request = null;
-                try {
-                    googleMap.clear();
-                    request = new SendPostRequest(new URL("http://parkaround.herokuapp.com/api/getParkingSpacesByAddress"));
-
-                    String address = mAddress.getText().toString();
-                    if(!address.equals("")) {
-                        JSONObject response = request.execute("?address=" + address).get();
-                        System.out.println("raspuns :" + response);
-
-                        Iterator<String> keys = response.keys();
-                        while (keys.hasNext()) {
-                            String key = keys.next();
-                            JSONObject row = new JSONObject(response.get(key).toString());
-                            addMarker(row);
-                            LatLng point = new LatLng(Float.parseFloat(row.get("latitude").toString()), Float.parseFloat(row.get("longitude").toString()));
-                            zoom(point);
-                            System.out.println("key: " + row.get("address"));
-                        }
-                    }
-                } catch (Exception e) {
-                    e.printStackTrace();
-
-                }
+            searchParkingSpotByAddress(mAddress.getText().toString());
             }
         });
 
@@ -131,17 +131,11 @@ public class MapViewFragment extends Fragment {
             public boolean onNavigationItemSelected(MenuItem menuItem) {
                 Context context = getActivity().getApplicationContext();
                 hideKeyboardFrom(context, v);
-                System.out.println("da");
                 if (menuItem.isChecked()) menuItem.setChecked(false);
                 else menuItem.setChecked(true);
-
                 //Closing drawer on item click
                 drawerLayout.closeDrawers();
-                System.out.println("1");
-                //Check to see which item was being clicked and perform appropriate action
                 switch (menuItem.getItemId()) {
-
-                    //Replacing the main content with ContentFragment
 
                     case R.id.nav_logout:
                     {
@@ -152,7 +146,7 @@ public class MapViewFragment extends Fragment {
                         Ed.putString("id", null);
                         Ed.putString("email", null);
                         Ed.putString("phone", null);
-                        Ed.putString("ecryptedPassword", null);
+                        Ed.putString("password", null);
                         Ed.commit();
                         getActivity().finishAffinity();
                     }
@@ -164,7 +158,6 @@ public class MapViewFragment extends Fragment {
 
         mMapView = (MapView) rootView.findViewById(R.id.mapView);
         mMapView.onCreate(savedInstanceState);
-
         mMapView.onResume();
 
         try {
@@ -201,8 +194,6 @@ public class MapViewFragment extends Fragment {
                     layoutParams.setMargins(0, 0, 30, 200);
                 }
 
-
-
                 googleMap.getUiSettings().setMyLocationButtonEnabled(true);
                 googleMap.getUiSettings().setCompassEnabled(true);
                 googleMap.getUiSettings().setMyLocationButtonEnabled(true);
@@ -224,8 +215,6 @@ public class MapViewFragment extends Fragment {
                         String key = keys.next();
                         JSONObject row = new JSONObject(response.get(key).toString());
                         addMarker(row);
-                        System.out.println("key: " + row.get("address"));
-
                     }
                 } catch (Exception e) {
                     e.printStackTrace();
@@ -233,6 +222,101 @@ public class MapViewFragment extends Fragment {
             }
         });
         return rootView;
+    }
+
+    public void searchParkingSpotByAddress(String address) {
+        SendPostRequest request = null;
+        try {
+            googleMap.clear();
+            request = new SendPostRequest(new URL("http://parkaround.herokuapp.com/api/getParkingSpacesByAddress"));
+            if(!address.equals("")) {
+                JSONObject response = request.execute("?address=" + address).get();
+                System.out.println("raspuns :" + response);
+                if(response.has("search_error")) {
+                    System.out.println("search_error");
+                    AlertDialog.Builder popupEroareBuilder = new AlertDialog.Builder(getActivity());
+
+                    popupEroareBuilder.setMessage("No parking spots found in your search area")
+                            .setTitle("No parking spots");
+
+                    final AlertDialog dialogPopupEroare = popupEroareBuilder.create();
+                    dialogPopupEroare.create();
+                    popupEroareBuilder.create();
+                    popupEroareBuilder.setPositiveButton("Try another location", new DialogInterface.OnClickListener() {
+                        public void onClick(DialogInterface dialog, int id) {
+                            dialogPopupEroare.dismiss();
+                        }
+                    });
+                    popupEroareBuilder.show();
+                }
+                else if(response.has("google_api_error")) {
+                    System.out.println("google_api_error");
+                    AlertDialog.Builder popupEroareBuilder = new AlertDialog.Builder(getActivity());
+
+                    popupEroareBuilder.setMessage("Internal error. Try again in a few minutes")
+                            .setTitle("Internal error");
+
+                    final AlertDialog dialogPopupEroare = popupEroareBuilder.create();
+                    popupEroareBuilder.setPositiveButton("Close", new DialogInterface.OnClickListener() {
+                        public void onClick(DialogInterface dialog, int id) {
+                            dialogPopupEroare.dismiss();
+                        }
+                    });
+                } else {
+                    Iterator<String> keys = response.keys();
+                    while (keys.hasNext()) {
+                        String key = keys.next();
+                        JSONObject row = new JSONObject(response.get(key).toString());
+                        addMarker(row);
+                        LatLng point = new LatLng(Float.parseFloat(row.get("latitude").toString()), Float.parseFloat(row.get("longitude").toString()));
+                        zoom(point);
+                    }
+                }
+            }
+        } catch (Exception e) {
+            e.printStackTrace();
+        }
+    }
+
+    public void searchParkingSpotByDirectLocation() {
+        SendPostRequest request = null;
+        try {
+            googleMap.clear();
+            request = new SendPostRequest(new URL("http://parkaround.herokuapp.com/api/getParkingSpacesByDirectLocation"));
+            double lat = getLatitude();
+            double lng = getLongitude();
+            JSONObject response = request.execute("?longitude=" + lng + "&latitude=" + lat).get();
+
+            System.out.println("raspuns :" + response);
+            if(response.has("search_error")) {
+                System.out.println("search_error");
+                AlertDialog.Builder popupEroareBuilder = new AlertDialog.Builder(getActivity());
+
+                popupEroareBuilder.setMessage("No parking spots found in your search area")
+                        .setTitle("No parking spots");
+
+                final AlertDialog dialogPopupEroare = popupEroareBuilder.create();
+                dialogPopupEroare.create();
+                popupEroareBuilder.create();
+                popupEroareBuilder.setPositiveButton("Try another location", new DialogInterface.OnClickListener() {
+                    public void onClick(DialogInterface dialog, int id) {
+                        dialogPopupEroare.dismiss();
+                    }
+                });
+                popupEroareBuilder.show();
+            } else {
+                Iterator<String> keys = response.keys();
+                while (keys.hasNext()) {
+                    String key = keys.next();
+                    JSONObject row = new JSONObject(response.get(key).toString());
+                    addMarker(row);
+                    LatLng point = new LatLng(Float.parseFloat(row.get("latitude").toString()), Float.parseFloat(row.get("longitude").toString()));
+                    zoom(point);
+                }
+            }
+        } catch (Exception e) {
+            e.printStackTrace();
+        }
     }
 
     public double getLatitude() {
@@ -248,9 +332,64 @@ public class MapViewFragment extends Fragment {
     }
 
     public void addMarker(JSONObject row) throws JSONException {
+        googleMap.setInfoWindowAdapter(new GoogleMap.InfoWindowAdapter() {
+
+            @Override
+            public View getInfoWindow(Marker arg0) {
+                return null;
+            }
+
+            @Override
+            public View getInfoContents(Marker marker) {
+                Context mContext = getActivity().getApplicationContext();
+                LinearLayout info = new LinearLayout(mContext);
+                info.setOrientation(LinearLayout.VERTICAL);
+
+                TextView title = new TextView(mContext);
+                title.setTextColor(Color.BLACK);
+                title.setGravity(Gravity.CENTER);
+                title.setTypeface(null, Typeface.BOLD);
+                title.setText(marker.getTitle());
+
+                TextView snippet = new TextView(mContext);
+                snippet.setTextColor(Color.GRAY);
+                snippet.setText(marker.getSnippet());
+
+                info.addView(title);
+                info.addView(snippet);
+
+                return info;
+            }
+        });
         LatLng point = new LatLng(Float.parseFloat(row.get("latitude").toString()), Float.parseFloat(row.get("longitude").toString()));
+        String snippet;
+        String days = new String();
+        if(row.get("sunday").toString().equals("1")) {
+            days += "Sunday, ";
+        } else if(row.get("monday").toString().equals("1")) {
+            days += "Monday, ";
+        } else if(row.get("tuesday").toString().equals("1")) {
+            days += "Tuesday, ";
+        } else if(row.get("wednesday").toString().equals("1")) {
+            days += "Wednesday, ";
+        } else if(row.get("thursday").toString().equals("1")) {
+            days += "Thursday, ";
+        } else if(row.get("friday").toString().equals("1")) {
+            days += "Friday, ";
+        } else if(row.get("saturday").toString().equals("1")) {
+            days += "Saturday, ";
+        }
+        if(!days.isEmpty())
+            days = days.substring(0, days.length() - 2);
+        snippet = "Details: " + row.get("details").toString()
+                + "\nOpen Hours: " + row.get("start_time").toString().substring(0,row.get("start_time").toString().length() - 3)
+                                        + " - " + row.get("end_time").toString().substring(0,row.get("end_time").toString().length() - 3)
+                + "\nOpen Days: " + days
+                + "\nPrice: " + row.get("price").toString() + "lei";
+        System.out.println(snippet);
         googleMap.addMarker(new MarkerOptions().position(point).
-                title(row.get("address").toString()).snippet(row.get("details").toString()));
+                title(row.get("address").toString())
+                .snippet(snippet));
     }
     public void zoom (LatLng point) {
         CameraPosition cameraPosition = new CameraPosition.Builder().target(point).zoom(12).build();
@@ -346,7 +485,6 @@ public class MapViewFragment extends Fragment {
                     }
 
                 } else {
-
                 }
                 return;
             }

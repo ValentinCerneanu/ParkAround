@@ -203,7 +203,6 @@ public class LoginActivity extends AppCompatActivity implements LoaderCallbacks<
             SendPostRequest request = null;
             try {
                 request = new SendPostRequest(new URL("http://parkaround.herokuapp.com/api/checkUser"));
-                BCrypt bCrypt = new BCrypt();
 
                 JSONObject response = request.execute("?email=" + email
                         + "&password=" + password).get();
@@ -227,7 +226,6 @@ public class LoginActivity extends AppCompatActivity implements LoaderCallbacks<
                     finish();
                 } else {
                     mPasswordView.setError(getString(R.string.error_incorrect_password));
-
                 }
             } catch (Exception e) {
                 e.printStackTrace();

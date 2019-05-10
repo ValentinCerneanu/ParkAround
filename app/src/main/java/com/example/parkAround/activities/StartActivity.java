@@ -24,7 +24,7 @@ public class StartActivity extends AppCompatActivity {
                 //set the new Content of your activity
                 SharedPreferences sharedPreferences = getSharedPreferences("Login", MODE_PRIVATE);
                 String email = sharedPreferences.getString("email", null);
-                String password = sharedPreferences.getString("ecryptedPassword", null);
+                String password = sharedPreferences.getString("password", null);
                 Intent nextActivity;
                 if(email == null || password == null) {
                     System.out.println("go to login");
@@ -33,7 +33,7 @@ public class StartActivity extends AppCompatActivity {
                     finish();
                 }
                 else {
-                    System.out.println("automaticalyy loggin");
+                    System.out.println("automaticaly loggin");
                     Intent intentToMainActivity = new Intent(getBaseContext(), MainActivity.class);
                     startActivity(intentToMainActivity);
                     finish();
